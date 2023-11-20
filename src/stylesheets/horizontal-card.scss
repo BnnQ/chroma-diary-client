@@ -1,0 +1,40 @@
+.horizontal-card {
+  background-color: #2D3943;
+  color: #fff;
+  border-radius: 2px;
+  margin-bottom: 8px;
+  display: flex;
+  padding: 8px 12px;
+  align-items: center;
+}
+
+.horizontal-card-image {
+  width: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.horizontal-card-content {
+  flex-grow: 1;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  min-width: 1px;
+  width: 1px;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: stretch;
+  row-gap: 0.8rem;
+  column-gap: 1.5rem;
+
+  .on-small-screen & {
+    grid-template-columns: 1fr;
+  }
+}
