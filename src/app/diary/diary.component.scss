@@ -1,0 +1,115 @@
+.file-attachment {
+  border-radius: 12px;
+  padding: 5px;
+  overflow: hidden;
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .card-text {
+    font-size: 14px;
+  }
+
+  i.fa-file {
+    cursor: pointer;
+  }
+}
+
+@import "../../stylesheets/general";
+.date-badge {
+  @extend .badge;
+  border-radius: 10px;
+  font-size: 12px;
+  //position: sticky !important;
+  //top: 0 !important;
+}
+
+.calendar {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+
+  th {
+    text-align: center;
+    font-weight: normal;
+    font-size: 14px;
+  }
+}
+
+.day {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; /* adjust as needed */
+}
+
+.day-image {
+  @extend .nav_image;
+
+  img {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+.today {
+  background-color: #45979a !important;
+  color: #fff !important;
+}
+.nav-arrows {
+  color: #fff;
+}
+
+.btn-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  &:hover .btn-pen {
+    @extend .visible;
+  }
+}
+
+.btn-circle {
+  color: #fff;
+  background-color: #45979a;
+  border: none;
+  border-radius: 50%;
+  padding: 10px 15px;
+  font-size: 24px;
+  line-height: 1.33;
+  transition: all 0.5s ease;
+
+  i {
+    position: relative;
+    top: -2px;
+  }
+
+  &:hover {
+    background-color: #3f8c8e;
+    color: #fff;
+  }
+}
+
+.btn-plus {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-pen {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  opacity: 0;
+  transition: all 0.5s ease;
+
+  .on-small-screen &, .on-medium-screen & {
+    @extend .visible;
+  }
+}
+
+.btn-pen.visible {
+  opacity: 1;
+  bottom: 56px;
+}
