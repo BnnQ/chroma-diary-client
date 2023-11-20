@@ -1,0 +1,42 @@
+<div id="main" appResponsive>
+  <nav class="sidebar" (mouseenter)="expandSidebar()" (mouseleave)="collapseSidebar()">
+    <div class="logo_items d-flex justify-content-center align-items-center">
+      <span class="logo_name">ChromaDiary</span>
+      <i id="lock-button" (click)="toggleSidebar()" title="Unlock Sidebar"></i>
+      <i id="eye-button" class="fa-light fa-eye-slash fa-sm" (click)="disableSidebar()" title="Hide Sidebar"></i>
+    </div>
+
+    <div class="menu_container">
+      <div class="menu_items">
+        <ul class="menu_item">
+          <div class="menu_title">
+            <span class="title">Diaries</span>
+            <div class="line"></div>
+          </div>
+          <ng-container *ngFor="let route of routes">
+            <li class="item" *ngIf="!route.path?.includes('/:')">
+              <a [routerLink]="route.path" [attr.aria-current]="route.path === (routeTrackerService.getCurrentRouteObservable() | async) ? 'page' : null" class="link d-flex align-items-center">
+                <i class="fa-regular {{route.data?.['icon']}}"></i>
+                <span>{{route.data?.['name']}}</span>
+              </a>
+            </li>
+          </ng-container>
+        </ul>
+      </div>
+
+      <div *ngIf="user !== undefined" class="sidebar_profile d-flex align-items-center">
+          <span class="nav_image">
+            <img src="{{user.avatarImagePath}}" alt="logo_img"/>
+          </span>
+        <div class="data_text">
+          <span class="name">{{user.fullName}}</span>
+          <span class="email">{{user.email}}</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <main>
+    <i class="fa-light fa-eye fa-sm" id="sidebar-open" title="Open Sidebar" (click)="enableSidebar()"></i>
+    <router-outlet></router-outlet>
+  </main>
+</div>
