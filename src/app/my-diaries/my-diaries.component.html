@@ -1,0 +1,152 @@
+<div id="wrapper" class="container-fluid mt-5">
+  <h1 class="text-center text-primary">My diaries</h1>
+  <div class="d-flex justify-content-end align-items-center mb-3">
+    <a class="btn btn-primary d-flex justify-content-center align-items-center text-center fw-bold ms-2"
+       data-bs-toggle="modal" data-bs-target="#creationDiaryModal">
+      <i class="fa-solid fa-plus me-2"></i>
+      Create
+    </a>
+  </div>
+  <div *ngIf="diaries" class="card-container">
+    <div *ngFor="let diary of diaries" class="horizontal-card"
+         [ngStyle]="{'box-shadow': '0 0 0 4.5px '.concat(diary.color)}">
+      <div class="horizontal-card-content">
+        <p class="m-0 fw-bold" style="font-size: 20px">{{diary.title}}</p>
+        <p class="m-0" style="font-size: 13px; color: #ddd">
+          <i class="fa-regular fa-calendar"></i>
+          Created {{diary.createdAt | date: 'dd.MM.yyyy'}}
+        </p>
+        <p class="m-0" style="font-size: 13px; color: #ddd">
+          <i class="fa-regular fa-rotate"></i>
+          Last updated {{diary.updatedAt | date: 'dd.MM.yyyy'}}
+        </p>
+
+        <div class="tag-list" *ngIf="diary.tags">
+          <div *ngFor="let tag of diary.tags" class="badge tag"
+               [ngStyle]="{'background-color': tag.color, 'color': tag.color | contrastColor}">
+            <i class="fa-solid fa-tag"></i>
+            {{tag.name}}
+          </div>
+        </div>
+      </div>
+      <div class="button-group button-list">
+        <button class="btn btn-small btn-primary btn-no-text">
+          <i class="fa-solid fa-pencil"></i>
+        </button>
+        <button class="btn btn-small btn-secondary btn-no-text">
+          <i class="fa-solid fa-box-archive"></i>
+        </button>
+        <button class="btn btn-small btn-danger btn-no-text" data-bs-toggle="modal"
+                data-bs-target="#deletionWarningModal" (click)="selectDiaryToDelete(diary)">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" style="font-size: 18px" id="deletionWarningModal" tabindex="-1" aria-hidden="true"
+     standalone>
+  <div class="modal-dialog">
+    <div class="modal-content" *ngIf="selectedDiaryToDelete">
+      <div class="modal-header bg-danger text-light">
+        <h5 class="modal-title">Warning</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this diary - <span
+        class="fw-bold">{{selectedDiaryToDelete.title}}</span>?
+        <div class="alert-danger-message mt-3">
+          <span class="fw-bold">All</span> posts, tags and attachments will be <span
+          class="fw-bold">deleted</span>.
+        </div>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-success fw-bold" data-bs-dismiss="modal" style="font-size: 18px">
+          <i class="fa-solid fa-check me-2"></i>
+          No
+        </button>
+        <button data-id="0" type="button" class="btn fw-bold" style="font-size: 18px" data-bs-dismiss="modal"
+                (click)="deleteDiary(selectedDiaryToDelete)">
+          <i class="fa-solid fa-exclamation-triangle me-2"></i>
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" style="font-size: 18px" id="creationDiaryModal" tabindex="-1" aria-hidden="true"
+     standalone>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h5 class="modal-title text-white fw-bold">Creation</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Form goes here -->
+        <form>
+          <!-- Other form fields go here -->
+
+          <!-- Diary Color -->
+          <div class="form-group mb-3">
+            <label>Diary Color</label>
+            <input [(colorPicker)]="diaryColor" [style.background]="diaryColor"/>
+          </div>
+
+          <!-- Tags -->
+          <div class="form-group mb-3">
+            <label>Tags</label>
+            <ngx-select-dropdown
+              name="dataModel"
+              [config]="dropdownConfig"
+              [options]="tags"
+              [(ngModel)]="selectedTags"
+              [multiple]="true"
+              (searchChange)="onSearch($event)"
+            ></ngx-select-dropdown>
+          </div>
+          <div class="form-group mb-2">
+            <input
+              type="text"
+              class="form-control"
+              id="otherTag"
+              name="tags"
+              [(ngModel)]="tagInput"
+              (keyup)="onKeyUp($event)"
+              (focusout)="onFocusOut()"
+            />
+            <div class="mt-2 d-flex flex-wrap gap-2">
+              <div *ngFor="let tag of additionalTags">
+                <span class="badge" [style.background]="tag.color" (click)="openColorPicker(tag)"
+                >{{ tag.name }}
+                  <button
+                    class="btn btn-sm border-0"
+                    (click)="removeTag(tag)"
+                  >
+                    x
+                  </button></span
+                >
+              </div>
+            </div>
+            <div *ngIf="additionalTags.length < 1" class="notice m-0">
+              If the existing tags are not enough, you can add your own -
+              just listing them separated by commas
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer justify-content-end">
+        <button type="button" class="btn" data-bs-dismiss="modal" style="font-size: 18px">
+          Cancel
+        </button>
+        <button data-id="0" type="button" class="btn btn-primary" style="font-size: 18px" data-bs-dismiss="modal">
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
