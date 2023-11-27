@@ -1,0 +1,21 @@
+.toggle-container {
+  display: flex;
+  align-items: center;
+
+  .on-small-screen &, .on-medium-screen & {
+    width: 100%;
+  }
+}
+
+.toggle-label {
+  margin-right: 16px;
+  flex-grow: 1;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.toggle {
+  width: 60px;
+  height: 30px;
+  position: relative;
+}
