@@ -1,0 +1,4 @@
+<div [ngClass]="classes">
+  <img *ngIf="mediaAttachment.image" [src]="mediaAttachment.url" alt="attachment"/>
+  <video *ngIf="mediaAttachment.video" [src]="mediaAttachment.url" controls></video>
+</div>
