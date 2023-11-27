@@ -1,69 +1,110 @@
-<div class="btn-container">
-  <button class="btn btn-circle btn-plus">
+<div class="btn-container" *ngIf="permissions.canEdit || permissions.canWrite">
+  <button class="btn btn-circle btn-plus" data-bs-toggle="modal" data-bs-target="#postCreationModal"
+          *ngIf="permissions.canWrite">
     <i class="fas fa-plus"></i>
   </button>
-  <button class="btn btn-circle btn-pen">
+  <button class="btn btn-circle btn-pen" [ngClass]="{'bg-primary': !isEditing, 'bg-warning': isEditing}"
+          *ngIf="permissions.canEdit"
+          [attr.data-can-only-edit]="permissions.canEdit && !permissions.canWrite" (click)="toggleEditing()">
     <i class="fas fa-pen"></i>
   </button>
 </div>
 
-
-<div class="container mt-3">
-  <div class="d-flex flex-column justify-content-center align-items-center gap-4">
-    <div class="post">
+<div class="container mt-3" *ngIf="permissions.canRead">
+  <div class="d-flex flex-column justify-content-center align-items-center gap-4"
+       infiniteScroll infiniteScrollContainer="#content" [fromRoot]="true"
+       [infiniteScrollDistance]="1" (scrolled)="onScroll()">
+    <div class="post" *ngFor="let post of posts" style="width: 100%; max-width: 40rem">
       <div class="text-center mb-3">
-                <span class="date-badge" data-bs-toggle="modal" data-bs-target="#calendar-modal" id="november14">
-                    November 14
-                </span>
+      <span class="date-badge" data-bs-toggle="modal" data-bs-target="#calendarModal" id="november14">
+        {{ post.createdAt | date:'MMMM' }} {{ post.createdAt | date:'d' }}
+      </span>
       </div>
 
-      <div class="card rounded" style="width: 40rem; background-color: #fff">
-        <div class="image-grid">
-          <div class="half-width top-left-media">
-            <img src="images/image1.jpg" alt="test"/>
-          </div>
-          <div class="half-width top-right-media">
-            <img src="images/image2.jpg" alt="test"/>
-          </div>
+      <div class="card rounded">
+        <div class="image-grid"
+             *ngIf="post.attachments && (post.attachments | containsMediaAttachment) && getLengthOfMediaAttachments(post.attachments) as mediaAttachmentsLength">
+          <ng-container *ngIf="filterMediaAttachments(post.attachments) as mediaAttachments">
+            <ng-container *ngFor="let attachment of mediaAttachments; let i = index">
+              <app-media-attachment [mediaAttachment]="attachment" [classes]="i | getAttachmentClasses:mediaAttachmentsLength"></app-media-attachment>
+            </ng-container>
+          </ng-container>
         </div>
         <div class="card-body">
-          <h5 class="card-title">Card title <span class="text-secondary"
-                                                  style="font-size: 13px">7:56 PM</span></h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-            card's content.</p>
-          <div class="badge" data-bs-toggle="collapse" data-bs-target="#file-attachment-1"
-               aria-expanded="false" aria-controls="file-attachment-1">
-            <i class="fa-light fa-paperclip"></i>
-            <span>2</span>
-          </div>
+          <div [innerHTML]="post.content"></div>
+          <!--                    <span class="text-secondary" style="font-size: 13px">7:56 PM</span></h5>-->
+          <ng-container
+            *ngIf="post.attachments && post.attachments.length > 0 && (post.attachments | containsFileAttachment)">
+            <div class="badge"
+                 data-bs-toggle="collapse" [attr.data-bs-target]="'#attachmentsContainer' + post.id"
+                 aria-expanded="false" [attr.aria-controls]="'attachmentsContainer' + post.id">
+              <i class="fa-light fa-paperclip"></i>
+              <span>{{filterFileAttachments(post.attachments).length}}</span>
+            </div>
 
-          <div id="file-attachment-1" class="card bg-light file-attachment collapse mt-2"
-               style="width: 305px; background-color: rgba(208, 232, 232, 0.45) !important">
-            <div class="card-body">
-              <div class="row g-5 mb-3">
-                <div class="col-2">
-                  <i class="fa-light fa-file fa-3x"></i>
-                </div>
-                <div class="col-10">
-                  <h5 class="card-title">attachment1.exe</h5>
-                  <p class="card-text">11.8 MB</p>
-                </div>
-              </div>
-              <div class="row g-5">
-                <div class="col-2">
-                  <i class="fa-light fa-file fa-3x"></i>
-                </div>
-                <div class="col-10">
-                  <h5 class="card-title">attachment2.exe</h5>
-                  <p class="card-text">13.4 MB</p>
+            <div [id]="'attachmentsContainer' + post.id" class="card bg-light file-attachment collapse mt-2"
+                 style="width: 305px; background-color: rgba(208, 232, 232, 0.45) !important">
+              <div class="card-body">
+                <div *ngFor="let attachment of filterFileAttachments(post.attachments)" class="row g-5 mb-3">
+                  <div class="col-2">
+                    <a [href]="attachment.url"><i class="fa-light fa-file fa-3x"></i></a>
+                  </div>
+                  <div class="col-10">
+                    <h5 class="card-title">{{attachment.name}}</h5>
+                    <p class="card-text" *ngIf="attachment.size">{{attachment.size | fileSize: 'auto'}} </p>
+                  </div>
                 </div>
               </div>
             </div>
+          </ng-container>
+
+          <div class="button-group button-list mt-2" *ngIf="isEditing">
+            <button class="btn btn-small btn-primary btn-no-text" data-bs-toggle="modal"
+                    data-bs-target="#postEditionModal" (click)="selectPostToEdit(post)">
+              <i class="fa-solid fa-pencil"></i>
+            </button>
+            <button *ngIf="permissions.canDelete" class="btn btn-small btn-danger btn-no-text" data-bs-toggle="modal"
+                    data-bs-target="#postDeletionModal" (click)="selectPostToDelete(post)">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
           </div>
 
         </div>
       </div>
     </div>
+  </div>
+</div>
 
+<ng-container *ngIf="diary">
+  <app-post-upsert *ngIf="permissions.canWrite"  [diaryId]="diary.id" [mode]="UpsertMode.Create" (submittedModelEvent)="createPost($event)"></app-post-upsert>
+  <app-post-upsert *ngIf="permissions.canEdit" [diaryId]="diary.id" [mode]="UpsertMode.Edit" [model]="selectedPostToEdit" (submittedModelEvent)="editPost($event)"></app-post-upsert>
+</ng-container>
+
+<div *ngIf="permissions.canDelete" class="modal fade" style="font-size: 18px" id="postDeletionModal" tabindex="-1" aria-hidden="true"
+     standalone>
+  <div class="modal-dialog">
+    <div class="modal-content" *ngIf="selectedPostToDelete">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Warning</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this post:
+        <div class="mt-3" [innerHTML]="selectedPostToDelete.content.substring(0, Math.min(100, selectedPostToDelete.content.length))"></div>
+        ...?
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-success fw-bold" data-bs-dismiss="modal" style="font-size: 18px">
+          <i class="fa-solid fa-check me-2"></i>
+          No
+        </button>
+        <button data-id="0" type="button" class="btn fw-bold" style="font-size: 18px" data-bs-dismiss="modal"
+                (click)="deletePost(selectedPostToDelete)">
+          <i class="fa-solid fa-exclamation-triangle me-2"></i>
+          Yes
+        </button>
+      </div>
+    </div>
   </div>
 </div>
