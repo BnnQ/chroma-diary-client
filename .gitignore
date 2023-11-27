@@ -44,3 +44,5 @@ src/stylesheets/libs
 src/webfonts
 *.css
 *.css.map
+
+package-lock.json
