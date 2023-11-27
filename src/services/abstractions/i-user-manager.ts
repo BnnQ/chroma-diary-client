@@ -11,8 +11,8 @@ export interface IUserManager {
   login(loginDto: UserLoginDto): Promise<string | void>;
   logout(): Promise<void>;
   getCurrentUser(): Promise<User>;
-  getCurrentUserId(): Promise<string>;
-  getUserById(id: string): Promise<User>;
+  getCurrentUserId(): Promise<number>;
+
+  getUserById(id: number): Promise<User>;
   getUser(username: string): Promise<User>;
-  editUserProfile(userEditDto: UserEditDto): Promise<void>;
 }

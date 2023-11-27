@@ -1,6 +1,8 @@
 import {Tag} from "../models/tag";
 import {ITagRepository} from "./abstractions/i-tag-repository";
+import {Injectable} from "@angular/core";
 
+@Injectable({providedIn: 'root'})
 export class StubTagRepositoryService implements ITagRepository
 {
   tags : Tag[];
