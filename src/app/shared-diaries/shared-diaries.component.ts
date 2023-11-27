@@ -5,11 +5,12 @@ import {SERVICE_IDENTIFIERS} from "../app.config";
 import {IDiaryRepository} from "../../services/abstractions/i-diary-repository";
 import {IUserManager} from "../../services/abstractions/i-user-manager";
 import {CustomPipesModule} from "../../modules/custom-pipes.module";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-shared-diaries',
   standalone: true,
-  imports: [CommonModule, CustomPipesModule],
+  imports: [CommonModule, CustomPipesModule, RouterLink],
   templateUrl: './shared-diaries.component.html',
   styleUrl: './shared-diaries.component.scss'
 })
@@ -26,6 +27,7 @@ export class SharedDiariesComponent implements OnInit {
   async ngOnInit(): Promise<void>
   {
     this.sharedDiaries = await this.diaryRepository.getSharedDiaries(await this.userManager.getCurrentUserId());
+    console.log(this.sharedDiaries);
   }
 
 }

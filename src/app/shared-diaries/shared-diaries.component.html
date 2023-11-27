@@ -1,9 +1,10 @@
 <div id="wrapper" class="container-fluid mt-5">
   <h1 class="text-center text-primary">Shared diaries</h1>
   <div *ngIf="sharedDiaries" class="card-container">
-    <div *ngFor="let diary of sharedDiaries" class="horizontal-card" [ngStyle]="{'box-shadow': '0 0 0 4.5px '.concat(diary.color)}">
-      <div class="horizontal-card-content">
-        <p class="m-0 fw-bold" style="font-size: 20px">{{diary.title}}</p>
+    <div *ngFor="let diary of sharedDiaries" class="horizontal-card"
+       [ngStyle]="{'box-shadow': '0 0 0 4.5px '.concat(diary.color)}">
+      <a class="horizontal-card-content" [routerLink]="['/diary', diary.id]">
+        <p class="m-0 fw-bold" style="font-size: 20px; color: #eee">{{diary.title}}</p>
         <p class="m-0" style="font-size: 13px; color: #ddd">
           <i class="fa-regular fa-calendar"></i>
           Created {{diary.createdAt | date: 'dd.MM.yyyy'}}
@@ -18,12 +19,13 @@
         </p>
 
         <div class="tag-list" *ngIf="diary.tags">
-          <div *ngFor="let tag of diary.tags" class="badge tag" [ngStyle]="{'background-color': tag.color, 'color': tag.color | contrastColor}">
+          <div *ngFor="let tag of diary.tags" class="badge tag"
+               [ngStyle]="{'background-color': tag.color, 'color': tag.color | contrastColor}">
             <i class="fa-solid fa-tag"></i>
             {{tag.name}}
           </div>
         </div>
-      </div>
+      </a>
     </div>
   </div>
 </div>
