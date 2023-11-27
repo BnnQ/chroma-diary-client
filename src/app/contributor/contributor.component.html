@@ -1,0 +1,60 @@
+<ng-container>
+  <div class="horizontal-card" style="padding-left: 2px !important">
+    <div class="horizontal-card-content">
+      <i class="fa-solid fa-user-edit fa-lg"></i>
+      {{contributor.user.fullName}} ({{contributor.user.username}})
+    </div>
+    <div class="button-group button-list" *ngIf="!isEditing">
+        <button type="button" class="btn btn-small btn-primary btn-no-text">
+          <i class="fa-solid fa-pencil" (click)="enableEdit()"></i>
+        </button>
+        <button type="button" class="btn btn-small btn-danger btn-no-text"
+                (click)="deleteContributor()">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+    </div>
+    <div class="button-group button-list" *ngIf="isEditing">
+      <button type="button" class="btn btn-small btn-primary btn-no-text">
+        <i class="fa-solid fa-check" (click)="changeContributorPermissions()"></i>
+      </button>
+      <button type="button" class="btn btn-small btn-danger btn-no-text"
+              (click)="disableEdit()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="permissions-container"
+       [id]="'contributorPermissionContainer' + contributor.id">
+    <div class="permissions" *ngIf="isEditing">
+      <div class="toggle-container">
+        <div class="toggle-label">Read</div>
+        <div class="toggle form-check">
+          <input class="form-check-input" name="canRead" type="checkbox"
+                 [(ngModel)]="contributor.permissions.canRead">
+        </div>
+      </div>
+      <div class="toggle-container">
+        <div class="toggle-label">Edit</div>
+        <div class="toggle form-check">
+          <input class="form-check-input" name="canEdit" type="checkbox"
+                 [(ngModel)]="contributor.permissions.canEdit">
+        </div>
+      </div>
+      <div class="toggle-container">
+        <div class="toggle-label">Write</div>
+        <div class="toggle form-check">
+          <input class="form-check-input" name="canWrite" type="checkbox"
+                 [(ngModel)]="contributor.permissions.canWrite">
+        </div>
+      </div>
+      <div class="toggle-container">
+        <div class="toggle-label">Delete</div>
+        <div class="toggle form-check">
+          <input class="form-check-input" name="canDelete" type="checkbox"
+                 [(ngModel)]="contributor.permissions.canDelete">
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
