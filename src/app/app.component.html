@@ -3,7 +3,8 @@
     <div class="logo_items d-flex justify-content-center align-items-center">
       <span class="logo_name">ChromaDiary</span>
       <i id="lock-button" (click)="toggleSidebar()" title="Unlock Sidebar"></i>
-      <i id="eye-button" class="fa-light fa-eye-slash fa-sm" (click)="disableSidebar()" title="Hide Sidebar"></i>
+      <i id="eye-button" class="fa-light fa-eye-slash fa-sm" (click)="disableSidebar()"
+         title="Hide Sidebar"></i>
     </div>
 
     <div class="menu_container">
@@ -14,28 +15,41 @@
             <div class="line"></div>
           </div>
           <ng-container *ngFor="let route of routes">
-            <li class="item" *ngIf="!route.path?.includes('/:')">
-              <a [routerLink]="route.path" [attr.aria-current]="route.path === (routeTrackerService.getCurrentRouteObservable() | async) ? 'page' : null" class="link d-flex align-items-center">
-                <i class="fa-regular {{route.data?.['icon']}}"></i>
-                <span>{{route.data?.['name']}}</span>
+            <li class="item" *ngIf="route.data">
+              <a [routerLink]="route.path"
+                 [attr.aria-current]="route.path === (routeTrackerService.getCurrentRouteObservable() | async) ? 'page' : null"
+                 class="link d-flex align-items-center">
+                <i class="fa-regular {{route.data['icon']}}"></i>
+                <span>{{route.data ['name']}}</span>
               </a>
             </li>
           </ng-container>
         </ul>
       </div>
 
-      <div *ngIf="user !== undefined" class="sidebar_profile d-flex align-items-center">
-          <span class="nav_image">
-            <img src="{{user.avatarImagePath}}" alt="logo_img"/>
-          </span>
-        <div class="data_text">
-          <span class="name">{{user.fullName}}</span>
-          <span class="email">{{user.email}}</span>
+      <div *ngIf="user" class="sidebar_profile d-flex align-items-center">
+        <!--          <span class="nav_image">-->
+        <!--            <img src="{{user.avatarImagePath}}" alt="logo_img"/>-->
+        <!--          </span>-->
+        <div class="data_text d-flex flex-column">
+          <div class="d-flex justify-content-center align-items-center gap-1">
+            <i class="fa-regular fa-user d-flex align-items-center"></i>
+            <span class="name">{{user.fullName}}</span>
+          </div>
+
+          <span class="email">{{user.username}}</span>
+          <a class="link-primary link-underline-opacity-0" style="cursor: pointer" (click)="logout()">Logout</a>
+        </div>
+      </div>
+      <div *ngIf="!user" class="sidebar_profile d-flex align-items-center">
+        <div class="data_text d-flex flex-column">
+          <a class="link-primary link-underline-opacity-0" [routerLink]="'/login'">Login</a>
+          <a class="link-primary link-underline-opacity-0" [routerLink]="'/register'">Register</a>
         </div>
       </div>
     </div>
   </nav>
-  <main>
+  <main id="content">
     <i class="fa-light fa-eye fa-sm" id="sidebar-open" title="Open Sidebar" (click)="enableSidebar()"></i>
     <router-outlet></router-outlet>
   </main>
