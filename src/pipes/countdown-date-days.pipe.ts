@@ -3,8 +3,9 @@ import {Pipe, PipeTransform} from "@angular/core";
 @Pipe({name: 'countdownDateDays'})
 export class CountdownDateDaysPipe implements PipeTransform
 {
-  transform(date: Date): number
+  transform(date : Date | string): number
   {
+    date = new Date(date);
     const currentDate = new Date();
     const difference = date.getTime() - currentDate.getTime();
     if (difference <= 0) return 0;
