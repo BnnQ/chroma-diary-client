@@ -1,0 +1,116 @@
+<div class="modal fade"
+     [attr.id]="mode === UpsertMode.Create ? 'diaryCreationModal' : 'diaryEditionModal'" tabindex="-1"
+     aria-labelledby="diaryModalLabel"
+     aria-hidden="true" standalone>
+  <div class="modal-dialog modal-dialog-centered">
+    <ng-container *ngIf="model">
+      <div class="modal-content" [style.box-shadow]="'0 0 0 4.5px '.concat(model.color)">
+        <div class="modal-header">
+          <h5 class="modal-title"
+              id="creationDiaryModalLabel">{{mode == UpsertMode.Create ? 'Create' : 'Edit'}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group mb-3">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-control" name="title" [(ngModel)]="model.title"/>
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label">Color</label>
+              <input type="color" class="form-control form-control-color" name="color" [(ngModel)]="model.color"
+                     [style.background-color]="model.color"/>
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label">Tags</label>
+              <ngx-select-dropdown
+                name="dataModel"
+                [config]="dropdownConfig"
+                [options]="tags"
+                [(ngModel)]="model.tags"
+                [multiple]="true"
+                (searchChange)="onSearch($event)"
+                [optionItemTemplate]="tagTemplate"
+                [selectedItemTemplate]="selectedTagTemplate"
+              ></ngx-select-dropdown>
+            </div>
+            <div class="form-group mb-2">
+              <input
+                type="text"
+                class="form-control"
+                id="otherTag"
+                name="tags"
+                placeholder="nor add a new tags..."
+                [(ngModel)]="tagInput"
+                (keyup)="onKeyUp($event)"
+                (focusout)="onFocusOut()"
+              />
+              <div class="my-2 d-flex flex-wrap gap-2">
+                <div *ngFor="let tag of model.additionalTags">
+                  <div style="position: relative;">
+                  <span class="badge" [style.background-color]="tag.color"
+                        [style.color]="tag.color | contrastColor" (click)="colorPicker.click()">
+                    {{ tag.name }}
+                    <button class="btn btn-sm text-danger border-0" (click)="removeTag(tag)">
+                      x
+                    </button>
+                  </span>
+                    <input #colorPicker type="color" name="color" [(ngModel)]="tag.color"
+                           style="position: absolute; bottom: 0; left: 0; visibility: hidden;">
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="isNoticeVisible" class="notice m-0">
+                If the existing tags are not enough, you can add your own - simply by listing them separated by
+                commas. You can change the color of the new tag by clicking on it. <span
+                class="btn-link link-primary" style="cursor: pointer"
+                (click)="hideNotice()">Don't show again</span>
+              </div>
+            </div>
+            <div class="form-group mb-2" *ngIf="contributors">
+              <label class="form-label">Contributors</label>
+              <ng-container *ngFor="let contributor of contributors">
+                <app-contributor [contributor]="contributor" (contributorPermissionsChanged)="changeContributorPermissions(contributor)" (contributorRemoved)="deleteContributor(contributor.id)"></app-contributor>
+              </ng-container>
+
+              <div class="form-group mb-3 g-3 row">
+                <div class="col-9">
+                  <input class="form-control" name="contributorName" [(ngModel)]="contributorName"
+                         placeholder="User username">
+                </div>
+                <div class="col-3">
+                  <button type="button" class="btn btn-primary w-100" (click)="addContributor(contributorName)">
+                    <i class="fa-solid fa-plus"></i>
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="sendSubmit(model)">
+            {{mode === UpsertMode.Create ? 'Create' : 'Save changes'}}
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #tagTemplate let-item="item">
+                <span class="badge" [style.background-color]="item.color"
+                      [style.color]="item.color | contrastColor">
+                  {{ item.name }}
+                </span>
+</ng-template>
+<ng-template #selectedTagTemplate let-item="item">
+                <span class="badge" [style.background-color]="item.color"
+                      [style.color]="item.color | contrastColor">
+                  {{ item.name }}
+                  <button class="btn btn-sm text-danger border-0">
+                    x
+                  </button>
+                </span>
+</ng-template>
