@@ -1,65 +1,125 @@
-import axios, {ResponseType} from "axios";
+import axios, {AxiosResponse, ResponseType} from "axios";
 import {Injectable} from "@angular/core";
 import IHttpService, {IOptions} from "./abstractions/i-http-service";
 import {IHttpParameters} from "../models/abstractions/i-http-parameters";
 import {IHttpHeaders} from "../models/abstractions/i-http-headers";
 import {UrlParametersHelper} from "../utils/url-parameters-helper";
+import {Router} from "@angular/router";
 
 @Injectable({providedIn: 'root'})
 export class AxiosHttpService implements IHttpService {
+  private readonly onUnauthorized: (response : AxiosResponse) => void;
+  constructor(router: Router) {
+    this.onUnauthorized = (reason : any) => {
+      if (reason.response.status === 401) {
+        router.navigate(['/login']);
+      }
+    };
+  }
+
+  withCredentials = true;
+
+  disableCredentials()
+  {
+    //this.withCredentials = false;
+  }
+
+  enableCredentials() {
+    this.withCredentials = true;
+  }
+
+  private appendAuthorizationHeaders(headers: IHttpHeaders | undefined)
+  {
+    if (this.withCredentials && (localStorage.getItem('token')?.length ?? 0) > 16) {
+      if (!headers)
+        headers = {};
+
+      headers['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+    }
+
+    return headers;
+  }
+
   async get<T>(url: URL, routeParameters?: IHttpParameters, queryParameters?: IHttpParameters,
-               headers?: IHttpHeaders, options? : IOptions): Promise<T> {
+               headers?: IHttpHeaders, options? : IOptions, responseHandler?: (response : AxiosResponse<T>) => void): Promise<T> {
     const mappedUrl: string = UrlParametersHelper.mapRouteAndQueryParametersToUrl(url,
       routeParameters,
       queryParameters);
 
-    const response = await axios.get<T>(mappedUrl, {
-      headers: headers,
-      withCredentials: true,
-      responseType: options?.responseType as ResponseType
+    const request = axios.get<T>(mappedUrl, {
+      headers: this.appendAuthorizationHeaders(headers),
+      withCredentials: this.withCredentials,
+      responseType: options?.responseType as ResponseType,
+      auth: options?.auth
     });
 
-    return response.data;
+    request.catch(this.onUnauthorized);
+    if (responseHandler)
+        request.then(responseHandler);
+
+    return (await request).data;
   }
 
   async post<T>(url: URL, body?: any, routeParameters?: IHttpParameters,
-                queryParameters?: IHttpParameters, headers?: IHttpHeaders): Promise<T> {
+                queryParameters?: IHttpParameters, headers?: IHttpHeaders, options? : IOptions, responseHandler?: (response : AxiosResponse<T>) => void): Promise<T> {
     const mappedUrl: string = UrlParametersHelper.mapRouteAndQueryParametersToUrl(url,
       routeParameters,
       queryParameters);
 
-    const response = await axios.post<T>(mappedUrl, body, {
-      headers: headers,
-      withCredentials: true
+    const request = axios.post<T>(mappedUrl, body, {
+      headers: this.appendAuthorizationHeaders(headers),
+      withCredentials: this.withCredentials,
+      auth: options?.auth,
     });
 
-    return response.data;
+    request.catch(this.onUnauthorized);
+    request.then((response) => {
+      console.log('response', response);
+    });
+    request.catch((reason) => {
+      console.log('error', reason);
+    });
+    if (responseHandler)
+      request.then(responseHandler);
+
+    return (await request).data;
   }
 
   async put<T>(url: URL, body?: any, routeParameters?: IHttpParameters,
-               queryParameters?: IHttpParameters, headers?: IHttpHeaders): Promise<T> {
+               queryParameters?: IHttpParameters, headers?: IHttpHeaders, options?: IOptions, responseHandler?: (response : AxiosResponse<T>) => void): Promise<T> {
     const mappedUrl: string = UrlParametersHelper.mapRouteAndQueryParametersToUrl(url,
       routeParameters,
       queryParameters);
 
-    const response = await axios.put<T>(mappedUrl, body, {
-      headers: headers,
-      withCredentials: true
+    const request = axios.put<T>(mappedUrl, body, {
+      headers: this.appendAuthorizationHeaders(headers),
+      withCredentials: this.withCredentials,
+      auth: options?.auth
     });
 
-    return response.data;
+    request.catch(this.onUnauthorized);
+    if (responseHandler)
+        request.then(responseHandler);
+
+    return (await request).data;
   }
 
   async delete<T>(url: URL, routeParameters?: IHttpParameters,
-                  queryParameters?: IHttpParameters, headers?: IHttpHeaders): Promise<T> {
+                  queryParameters?: IHttpParameters, headers?: IHttpHeaders, options?: IOptions, responseHandler?: (response : AxiosResponse<T>) => void): Promise<T> {
     const mappedUrl: string = UrlParametersHelper.mapRouteAndQueryParametersToUrl(url,
       routeParameters,
       queryParameters);
-    const response = await axios.delete<T>(mappedUrl, {
-      headers: headers,
-      withCredentials: true
+
+    const request = axios.delete<T>(mappedUrl, {
+      headers: this.appendAuthorizationHeaders(headers),
+      withCredentials: this.withCredentials,
+      auth: options?.auth
     });
 
-    return response.data;
+    request.catch(this.onUnauthorized);
+    if (responseHandler)
+        request.then(responseHandler);
+
+    return (await request).data;
   }
 }
