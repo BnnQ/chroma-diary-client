@@ -32,3 +32,24 @@
   background-color: #45979a;
   font-weight: 500;
 }
+
+.notice {
+  background: #d0e8e8;
+  font-size: 12px;
+  padding: 5px 6px 4px;
+  border-radius: 2px;
+  margin-top: 8px;
+}
+
+.color-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.rainbow-circle
+{
+  @extend .color-circle;
+  background-image: linear-gradient(to right, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+}
