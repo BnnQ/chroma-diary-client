@@ -1,17 +1,23 @@
 <div id="wrapper" class="container-fluid mt-5">
   <h1 class="text-center text-primary">My diaries</h1>
-  <div class="d-flex justify-content-end align-items-center mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <input type="text" class="form-control w-auto" placeholder="Search by title..." (keydown.enter)="filterByTitle($event)"/>
     <a class="btn btn-primary d-flex justify-content-center align-items-center text-center fw-bold ms-2"
-       data-bs-toggle="modal" data-bs-target="#creationDiaryModal">
+       data-bs-toggle="modal" data-bs-target="#diaryCreationModal">
       <i class="fa-solid fa-plus me-2"></i>
       Create
     </a>
   </div>
-  <div *ngIf="diaries" class="card-container">
-    <div *ngFor="let diary of diaries" class="horizontal-card"
+  <div class="d-flex mb-3 gap-2">
+    <div class="rainbow-circle" (click)="resetFilter()"></div>
+    <div *ngFor="let color of distinctColors" class="color-circle" [ngStyle]="{'background-color': color}"
+         (click)="filterByColor(color)"></div>
+  </div>
+  <div *ngIf="filteredDiaries" class="card-container">
+    <div *ngFor="let diary of filteredDiaries" class="horizontal-card"
          [ngStyle]="{'box-shadow': '0 0 0 4.5px '.concat(diary.color)}">
-      <div class="horizontal-card-content">
-        <p class="m-0 fw-bold" style="font-size: 20px">{{diary.title}}</p>
+      <a class="horizontal-card-content" [routerLink]="['/diary', diary.id]">
+        <p class="m-0 fw-bold" style="font-size: 20px; color: #eee">{{diary.title}}</p>
         <p class="m-0" style="font-size: 13px; color: #ddd">
           <i class="fa-regular fa-calendar"></i>
           Created {{diary.createdAt | date: 'dd.MM.yyyy'}}
@@ -28,28 +34,30 @@
             {{tag.name}}
           </div>
         </div>
-      </div>
+      </a>
       <div class="button-group button-list">
-        <button class="btn btn-small btn-primary btn-no-text">
+        <button class="btn btn-small btn-primary btn-no-text" data-bs-toggle="modal"
+                data-bs-target="#diaryEditionModal" (click)="selectDiaryToEdit(diary)">
           <i class="fa-solid fa-pencil"></i>
         </button>
-        <button class="btn btn-small btn-secondary btn-no-text">
-          <i class="fa-solid fa-box-archive"></i>
-        </button>
-        <button class="btn btn-small btn-danger btn-no-text" data-bs-toggle="modal"
-                data-bs-target="#deletionWarningModal" (click)="selectDiaryToDelete(diary)">
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
-      </div>
-    </div>
-  </div>
+        <button class="btn btn-small btn-secondary btn-no-text" data-bs-toggle="modal"
+                data-bs-target="#diaryArchivationModal" (click)="selectDiaryToArchive(diary)">
+  <i class="fa-solid fa-box-archive"></i>
+  </button>
+  <button class="btn btn-small btn-danger btn-no-text" data-bs-toggle="modal"
+          data-bs-target="#deletionWarningModal" (click)="selectDiaryToDelete(diary)">
+    <i class="fa-solid fa-trash-can"></i>
+  </button>
+</div>
+</div>
+</div>
 </div>
 
 <div class="modal fade" style="font-size: 18px" id="deletionWarningModal" tabindex="-1" aria-hidden="true"
      standalone>
   <div class="modal-dialog">
     <div class="modal-content" *ngIf="selectedDiaryToDelete">
-      <div class="modal-header bg-danger text-light">
+      <div class="modal-header bg-danger text-white">
         <h5 class="modal-title">Warning</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                 aria-label="Close"></button>
@@ -77,76 +85,46 @@
   </div>
 </div>
 
-<div class="modal fade" style="font-size: 18px" id="creationDiaryModal" tabindex="-1" aria-hidden="true"
+<div class="modal fade" style="font-size: 18px" id="diaryArchivationModal" tabindex="-1" aria-hidden="true"
      standalone>
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-primary">
-        <h5 class="modal-title text-white fw-bold">Creation</h5>
+  <div class="modal-dialog">
+    <div class="modal-content" *ngIf="selectedDiaryToArchive">
+      <div class="modal-header bg-warning text-white">
+        <h5 class="modal-title">Warning</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                 aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Form goes here -->
-        <form>
-          <!-- Other form fields go here -->
-
-          <!-- Diary Color -->
-          <div class="form-group mb-3">
-            <label>Diary Color</label>
-            <input [(colorPicker)]="diaryColor" [style.background]="diaryColor"/>
-          </div>
-
-          <!-- Tags -->
-          <div class="form-group mb-3">
-            <label>Tags</label>
-            <ngx-select-dropdown
-              name="dataModel"
-              [config]="dropdownConfig"
-              [options]="tags"
-              [(ngModel)]="selectedTags"
-              [multiple]="true"
-              (searchChange)="onSearch($event)"
-            ></ngx-select-dropdown>
-          </div>
-          <div class="form-group mb-2">
-            <input
-              type="text"
-              class="form-control"
-              id="otherTag"
-              name="tags"
-              [(ngModel)]="tagInput"
-              (keyup)="onKeyUp($event)"
-              (focusout)="onFocusOut()"
-            />
-            <div class="mt-2 d-flex flex-wrap gap-2">
-              <div *ngFor="let tag of additionalTags">
-                <span class="badge" [style.background]="tag.color" (click)="openColorPicker(tag)"
-                >{{ tag.name }}
-                  <button
-                    class="btn btn-sm border-0"
-                    (click)="removeTag(tag)"
-                  >
-                    x
-                  </button></span
-                >
-              </div>
-            </div>
-            <div *ngIf="additionalTags.length < 1" class="notice m-0">
-              If the existing tags are not enough, you can add your own -
-              just listing them separated by commas
-            </div>
-          </div>
-        </form>
+        Are you sure you want to archive this diary - <span
+        class="fw-bold">{{selectedDiaryToArchive.title}}</span>?
+        <div class="alert-danger-message mt-3" *ngIf="_archivationDate">
+          You can restore it until <span class="fw-bold">{{_archivationDate | date: 'dd.MM.yyyy'}}</span> (<span class="fw-bold">{{_archivationDate | countdownDateDays}}</span> days).
+          <span class="fw-bold">All</span> posts, tags and attachments will be <span
+          class="fw-bold">available</span> until archivation term expires. After arhicvation term expires, all
+          data will be <span class="fw-bold">deleted</span>.
+        </div>
+        <div class="form-group mt-3">
+          <label class="form-label" for="archivationDateInput">Change expiration date</label>
+          <input type="date" [min]="DateHelper.getCurrentDatePlusDays(2) | date: 'yyyy-MM-dd'" name="archivationDate" id="archivationDateInput" class="form-control"
+                 [(ngModel)]="archivationDate" required>
+        </div>
       </div>
       <div class="modal-footer justify-content-end">
         <button type="button" class="btn" data-bs-dismiss="modal" style="font-size: 18px">
           Cancel
         </button>
-        <button data-id="0" type="button" class="btn btn-primary" style="font-size: 18px" data-bs-dismiss="modal">
-          Create
+        <button data-id="0" type="button" class="btn btn-success" style="font-size: 18px"
+                data-bs-dismiss="modal"
+                (click)="archiveDiary(selectedDiaryToArchive)" [disabled]="!_archivationDate">
+          Archive
         </button>
       </div>
     </div>
   </div>
 </div>
+
+<app-diary-upsert [mode]="UpsertMode.Create"
+                  (submittedModelEvent)="createDiary($event)"></app-diary-upsert>
+<app-diary-upsert [mode]="UpsertMode.Edit" [model]="selectedDiaryToEdit | async"
+                    (submittedModelEvent)="editDiary($event)"></app-diary-upsert>
+
