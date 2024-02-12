@@ -7,7 +7,7 @@ ChromaDiary is a platform for expressing yourself, documenting your life, and sh
 ChromaDiary is built with modern and powerful technologies. The client-side is written in **Angular 17**, a popular and robust framework for creating dynamic and responsive web applications. The [server-side](https://github.com/BnnQ/chroma-diary-server) is a REST API based on **Spring**, a comprehensive and versatile platform for developing enterprise-grade applications. The API uses JPA Hibernate for object-relational mapping and **Spring Security** for authentication and authorization. The database is **MySQL**, a reliable and widely used relational database management system.
 
 
-# Screenshotes
+# Screenshots
 
 ![image](https://github.com/BnnQ/chroma-diary-client/assets/115489239/0cb26ba9-3359-4b94-b970-5c89ba0555fe)
 ![image](https://github.com/BnnQ/chroma-diary-client/assets/115489239/2a7cba3f-3688-48ae-9818-c49fb6d94aff)
